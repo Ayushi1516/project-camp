@@ -36,14 +36,13 @@ export class LoginComponent {
   login(currentUser: any) {
     this.isLoading.set(true);
     this.authService.loginUser(currentUser).subscribe({
-      next: () => {
+      next: (user) => {
         this.isLoading.set(false);
         // Redirect based on user role
-        const userRole = this.authService.userRole();
-        if (userRole === 'admin') {
+        if (user?.role === 'admin') {
           this.router.navigateByUrl('/admin');
-        } else if (userRole === 'member' || userRole === 'project_admin') {
-          this.router.navigateByUrl('/member');
+        } else if (user?.role === 'member' || user?.role === 'project_admin') {
+          this.router.navigate(['/member', user.id]);
         } else {
           this.router.navigateByUrl('/dashboard');
         }

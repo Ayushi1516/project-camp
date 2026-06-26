@@ -1,0 +1,28 @@
+<div class="w-full bg-white p-8 rounded-xl shadow-lg">
+  <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Create New Project</h2>
+  <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+    <!-- Project Name -->
+    <div class="mb-6">
+      <label for="name" class="block text-gray-700 font-semibold mb-2">Project Name</label>
+      <input type="text" id="name" formControlName="name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="e.g., Q4 Marketing Campaign">
+    </div>
+
+    <!-- Created By -->
+    <div class="mb-6">
+      <label for="createdBy" class="block text-gray-700 font-semibold mb-2">Created By</label>
+      <input type="text" id="createdBy"  formControlName="createdBy" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="Your Name">
+    </div>
+
+    <!-- Description -->
+    <div class="mb-8">
+      <label for="description" class="block text-gray-700 font-semibold mb-2">Description</label>
+      <textarea id="description" formControlName="description" rows="4" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow" placeholder="A brief summary of the project's goals..."></textarea>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex justify-end space-x-4">
+      <button (click)="onCancel()" type="button" class="py-2 px-6 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
+      <button  type="submit" class="py-2 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-transform transform hover:scale-105">Create Project</button>
+    </div>
+  </form>
+</div>

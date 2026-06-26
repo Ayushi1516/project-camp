@@ -2,12 +2,14 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { AuthResponse, AuthUser, User } from '../models/user.model';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, switchMap, tap, throwError, of } from 'rxjs';
+import { CommonService } from './common.service';
 
 @Injectable({ providedIn: 'root' })
 
 export class AuthService {
   apiUrl = 'http://localhost:3000/api/v1/auth/';
   private http = inject(HttpClient);
+  private cs = inject(CommonService);
   currentUser = signal<AuthUser | null>(null);
   token = signal<string | null>(null);
   isAuthenticated = computed(() => !!this.token());
@@ -17,19 +19,15 @@ export class AuthService {
     this.restoreSession();
   }
 
-  private handleError(error: HttpErrorResponse) {
-    let errorMessage = 'An unexpected error occurred';
-    
-    if (error.error instanceof ErrorEvent) {
-      // Client-side error
-      errorMessage = error.error.message;
-    } else {
-      // Server-side error
-      errorMessage = error?.error?.message || error.statusText || errorMessage;
+
+  private _mapUser(user: any): AuthUser | null {
+    if (!user) return null;
+    // If _id exists, map it to id and spread the rest of the user properties.
+    if (user._id) {
+      const { _id, ...rest } = user;
+      return { id: _id, ...rest };
     }
-    
-    console.error('API Error:', errorMessage);
-    return throwError(() => new Error(errorMessage));
+    return user as AuthUser;
   }
 
   loginUser(user: User) {
@@ -41,7 +39,7 @@ export class AuthService {
           this.setToken(token);
         }
 
-        let respUser = response?.user ?? response?.data?.user ?? null;
+        let respUser = this._mapUser(response?.user ?? response?.data?.user);
         
         // If no user in response, parse from token
         if (!respUser && token) {
@@ -65,25 +63,25 @@ export class AuthService {
       }),
       // If currentUser already present from response, skip fetching; otherwise call protected endpoint
       switchMap(() => (this.currentUser() ? of(this.currentUser()) : this.fetchCurrentUser())),
-      catchError((error: HttpErrorResponse) => this.handleError(error))
+      catchError((error: HttpErrorResponse) => this.cs.handleError(error))
     );
   }
 
   requestPasswordReset(email: any) {
     return this.http.post(`${this.apiUrl}forgot-password`, { email }).pipe(
-      catchError((error: HttpErrorResponse) => this.handleError(error))
+      catchError((error: HttpErrorResponse) => this.cs.handleError(error))
     );
   }
 
   verifyResetCode(email: any, code: any, password: any) {
     return this.http.post(`${this.apiUrl}reset-password/${code}`, { email, code, password }).pipe(
-      catchError((error: HttpErrorResponse) => this.handleError(error))
+      catchError((error: HttpErrorResponse) => this.cs.handleError(error))
     );
   }
 
   registerUser(user: User) {
     return this.http.post(`${this.apiUrl}register`, user).pipe(
-      catchError((error: HttpErrorResponse) => this.handleError(error))
+      catchError((error: HttpErrorResponse) => this.cs.handleError(error))
     );
   }
 
@@ -129,7 +127,7 @@ export class AuthService {
           }
         }
 
-        this.currentUser.set(enrichedUser);
+        this.currentUser.set(this._mapUser(enrichedUser));
         if (typeof window !== 'undefined' && 'localStorage' in window) {
           localStorage.setItem('auth_user', JSON.stringify(enrichedUser));
         }
@@ -142,7 +140,7 @@ export class AuthService {
 
     this.setToken(response.token);
 
-    const authUser = response.user ?? this.parseTokenUser(response.token);
+    const authUser = this._mapUser(response.user) ?? this.parseTokenUser(response.token);
     if (authUser) {
       this.currentUser.set(authUser);
       if (typeof window !== 'undefined' && 'localStorage' in window) {
@@ -175,17 +173,18 @@ export class AuthService {
   }
 
   private parseTokenUser(token: string): AuthUser | null {
-    const payload = this.parseJwt<{ id?: string; email?: string; name?: string; username?: string; role?: AuthUser['role'] }>(token);
+    const payload = this.parseJwt<{ id?: string; _id?: string; email?: string; name?: string; username?: string; role?: AuthUser['role'] }>(token);
     if (!payload || !payload.role) {
       return null;
     }
 
-    return {
-      id: payload.id,
+    const user = {
+      id: payload.id ?? payload._id,
       email: payload.email ?? null,
       name: payload.name ?? payload.username ?? '',
       role: payload.role,
     };
+    return this._mapUser(user);
   }
 
   private parseJwt<T>(token: string): T | null {

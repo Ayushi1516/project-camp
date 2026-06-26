@@ -1,0 +1,20 @@
+<!-- This is the CDK Dialog container. The backdrop is handled by the CDK. -->
+<div class="bg-white rounded-xl shadow-lg w-full max-w-4xl" role="dialog">
+  <!-- Header -->
+  <header class="flex items-center justify-between p-4 border-b border-gray-200">
+    <h2 class="text-xl font-semibold text-gray-800">{{ title }}</h2>
+    <button (click)="onClose()" class="p-1 rounded-full text-gray-400 hover:bg-gray-200 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400">
+      <!-- Heroicon: x-mark -->
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </header>
+
+  <!-- Body (Content Projection) -->
+  <main class="p-6">
+    <ng-content></ng-content>
+  </main>
+
+  <!-- Footer is now part of the projected content (e.g., inside ProjectFormComponent) -->
+</div>

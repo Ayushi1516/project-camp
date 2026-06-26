@@ -4,7 +4,6 @@ import { LoginComponent } from './auth/login/login';
 import { RegisterComponent } from './auth/register/register';
 import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password';
 import { ResetPasswordComponent } from './auth/reset-password/reset-password';
-import { DashboardComponent } from './features/dashboard/dashboard';
 import { AdminDashboardComponent } from './features/admin/admin-dashboard';
 import { MemberDashboardComponent } from './features/member/member-dashboard';
 import { AuthGuard } from './core/guards/auth.guard';
@@ -15,12 +14,12 @@ export const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'reset-password', component: ResetPasswordComponent },
-  {
+  /* {
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [AuthGuard],
     data: { roles: ['admin', 'project_admin', 'member'] },
-  },
+  }, */
   {
     path: 'admin',
     component: AdminDashboardComponent,
@@ -28,10 +27,11 @@ export const routes: Routes = [
     data: { roles: ['admin'] },
   },
   {
-    path: 'member',
-    component: MemberDashboardComponent,
-    canActivate: [AuthGuard],
-    data: { roles: ['member', 'project_admin'] },
+    path: 'member/:userId',
+    loadChildren: () => import('./features/member/member.routes')
+      .then(r => r.MEMBER_ROUTES),
+    /* canActivate: [AuthGuard],
+    data: { roles: ['member', 'project_admin'] }, */
   },
   { path: '**', redirectTo: '', pathMatch: 'full' },
 ];
