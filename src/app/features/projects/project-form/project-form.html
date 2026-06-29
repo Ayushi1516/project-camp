@@ -1,5 +1,11 @@
 <div class="w-full bg-white p-8 rounded-xl shadow-lg">
-  <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">Create New Project</h2>
+  <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center">
+    @if(isEditMode) {
+      Update Project
+    } @else {
+      Create New Project
+    }
+  </h2>
   <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
     <!-- Project Name -->
     <div class="mb-6">
@@ -22,7 +28,11 @@
     <!-- Action Buttons -->
     <div class="flex justify-end space-x-4">
       <button (click)="onCancel()" type="button" class="py-2 px-6 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors">Cancel</button>
-      <button  type="submit" class="py-2 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-transform transform hover:scale-105">Create Project</button>
+      <button  type="submit" class="py-2 px-6 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75 transition-transform transform hover:scale-105">@if(isEditMode) {
+      Update Project
+    } @else {
+      Create Project
+    }</button>
     </div>
   </form>
 </div>

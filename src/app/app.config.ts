@@ -6,14 +6,16 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/http';
 import { apiErrorInterceptor } from './core/interceptors/api-error.interceptor';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideToastr } from 'ngx-toastr';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(routes), provideClientHydration(withEventReplay()),
+    provideRouter(routes), /* provideClientHydration(withEventReplay()) ,*/
     provideHttpClient(
       withFetch(),
       withInterceptors([authInterceptor, apiErrorInterceptor])
-    )
+    ),
+    provideToastr()
   ]
 };

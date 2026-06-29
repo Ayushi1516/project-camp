@@ -1,7 +1,11 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Dialog, DialogModule } from '@angular/cdk/dialog';
 import { ProjectFormComponent } from '../project-form/project-form';
-import { ProjectService } from '../project.service';
+import { ProjectService } from '../../../services/project.service';
+import { NotificationService } from '../../../services/notification.service';
+import { project, Projects } from '../../../models/project.model';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-project-list',
@@ -12,14 +16,17 @@ import { ProjectService } from '../project.service';
 export class ProjectListComponent {
   private readonly dialog = inject(Dialog);
   private projectService = inject(ProjectService);
+  private notificationService = inject(NotificationService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
   private refreshTrigger = signal(0);
 
-  projects = signal<any[]>([]);
+  projects = signal<Projects[]>([]);
   isLoading = signal<boolean>(false);
   projectCount = computed(() => this.projects().length);
 
   // This would be determined by your authentication service
-  isAdmin = true;
+  isAdmin = this.authService.hasRole('admin') || false;
 
   constructor() {
     // This effect will run once on creation, and again every time
@@ -31,10 +38,11 @@ export class ProjectListComponent {
     });
   }
 
-  openCreateProjectDialog(): void {
+  openCreateProjectDialog(project?: project): void {
     const dialogRef = this.dialog.open<boolean>(ProjectFormComponent, {
       width: '600px', // You can set the width here
       maxWidth: '90vw', // A good practice for responsiveness
+      data: {project}
     });
 
     dialogRef.closed.subscribe(result => {
@@ -62,11 +70,30 @@ export class ProjectListComponent {
     })
   }
 
-  onUpdate(projectId: number) {
-    console.log('Update project:', projectId); 
+  navigateToProjectDetail(projectId: string): void {
+    const userId = this.authService.currentUser()?.id;
+    if (!userId) {
+      this.notificationService.showError('Could not find user ID to navigate.');
+      return;
+    }
+    this.router.navigate(['/member', userId, 'projects', projectId]);
   }
 
-  onDelete(projectId: number) {
-    console.log('Delete project:', projectId);
+  onUpdate(projectId: string) {
+    const projectToUpdate = this.projects().find(p => p.project._id == projectId);
+    projectToUpdate ? this.openCreateProjectDialog(projectToUpdate.project) : null;
+  }
+
+  onDelete(projectId: string) {
+    const projectToDelete = this.projects().find(p => p.project._id == projectId);
+    projectToDelete ? this.projectService.deleteProject(projectId).subscribe({
+      next: () => {
+        this.notificationService.showSuccess('Project deleted successfully.');
+        this.refreshTrigger.update(count => count + 1);
+      },
+      error: () => {
+        this.notificationService.showError('Failed to delete project.');
+      }
+    }) : null;
   }
 }

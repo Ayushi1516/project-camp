@@ -1,6 +1,10 @@
-export interface Project {
-  id: string;
+export interface Projects {
+  project: project,
+}
+
+export interface project {
+  _id: string;
   name: string;
   description?: string;
-  membersCount?: number;
+  members?: number;
 }

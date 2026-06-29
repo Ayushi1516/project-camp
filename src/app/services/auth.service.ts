@@ -94,6 +94,12 @@ export class AuthService {
     }
   }
 
+  logoutUser(user: User) {
+    return this.http.post(`${this.apiUrl}logout`, user).pipe(
+      catchError((error: HttpErrorResponse) => this.cs.handleError(error))
+    );
+  }
+
   getToken() {
     return this.token();
   }

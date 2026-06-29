@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -10,6 +10,7 @@ import { AuthService } from '../../services/auth.service';
 export class MemberDashboardComponent {
   private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
+  private router = inject(Router);
     isSidebarOpen = signal(false);
 
 
@@ -21,5 +22,10 @@ export class MemberDashboardComponent {
 
   toggleSidebar() {
     this.isSidebarOpen.update(open => !open);
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigateByUrl('/');
   }
 }

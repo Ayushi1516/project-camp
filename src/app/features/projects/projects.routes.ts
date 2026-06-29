@@ -7,5 +7,5 @@ import { ProjectFormComponent } from "./project-form/project-form";
 export const PROJECT_ROUTES: Routes = [
   { path: '', component: ProjectListComponent,  },
   { path: ':id', component: ProjectDetailComponent, },
-  { path: 'new-project', component: ProjectFormComponent,  }
+  { path: '', component: ProjectFormComponent,  }
 ];

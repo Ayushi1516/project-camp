@@ -14,29 +14,29 @@
   } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <!-- This is a template for a single project card. You would loop over this. -->
-      @for (project of projects(); track project.project.id) {
-        <div class="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-xl transition-shadow duration-300 flex flex-col justify-between">
-          <!-- Replace '1' with project.id -->
-          <div class="flex justify-between items-start mb-4">
-            <h2 class="text-xl font-semibold text-gray-900">{{ project.project.name }}</h2>
+      @for (project of projects(); track project.project._id) {
+        <div (click)="navigateToProjectDetail(project.project._id)" class="bg-white rounded-md shadow-sm p-4 cursor-pointer hover:bg-gray-50 transition-colors duration-200 flex flex-col justify-between">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-base font-medium text-gray-800 truncate" title="{{ project.project.name }}">{{ project.project.name }}</h2>
             @if (isAdmin) {
               <div class="flex items-center space-x-2">
                 <!-- Admin-only actions. Stop propagation to prevent card click. -->
-                <button class="p-1 rounded-full hover:bg-gray-200 transition-colors" (click)="$event.stopPropagation(); onUpdate(project.project.id)">
-                  <span class="text-lg">✏️</span> <!-- Edit Icon -->
+                <button class="p-1 rounded-full hover:bg-gray-200 transition-colors" (click)="$event.stopPropagation(); onUpdate(project.project._id)">
+                  <span class="text-base">✏️</span> <!-- Edit Icon -->
                 </button>
-                <button class="p-1 rounded-full text-gray-500 hover:bg-red-100 hover:text-red-600 transition-colors" (click)="$event.stopPropagation(); onDelete(project.project.id)">
-                  <span class="text-lg">🗑️</span> <!-- Delete Icon -->
+                <button class="p-1 rounded-full text-gray-500 hover:bg-red-100 hover:text-red-600 transition-colors" (click)="$event.stopPropagation(); onDelete(project.project._id)">
+                  <span class="text-base">🗑️</span> <!-- Delete Icon -->
                 </button>
               </div>
             }
           </div>
-          <p class="text-gray-600 mb-4">{{ project.project.description }}</p>
-          <div class="mt-auto pt-4 border-t border-gray-200">
-            <div class="flex items-center text-sm text-gray-500">
-              <span class="mr-2">👥</span> {{project.project.members}}
-              </div>
+          <p class="text-sm text-gray-600 mb-4 flex-grow">{{ project.project.description }}</p>
+          <div class="mt-auto flex justify-between items-center">
+            <div class="flex items-center text-xs text-gray-500">
+              <span class="mr-2">👥</span> {{project.project.members}} Members
             </div>
+           
+          </div>
         </div>
       }
       <!-- End of project card template -->
